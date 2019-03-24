@@ -4,24 +4,27 @@ const createError    = require('http-errors'),
       bodyParser     = require('body-parser'),
       path           = require('path'),
       cookieParser   = require('cookie-parser'),
-      logger         = require('morgan'),
+      appRoot        = require('app-root-path'),
+      morgan         = require('morgan'),
+      winston        = require('./config/Winston'),
       session        = require('express-session'),
       cors           = require('cors'),
       sassMiddleware = require('node-sass-middleware'),
       isProduction   = process.env.NODE_ENV === 'production',
-      db             = require('./config/mongoose'),
+      db             = require('./config/Mongoose'),
       mongoose       = db.mongoose,
       Schema         = db.Schema,
-      bcrypt         = require('bcrypt')
+      bcrypt         = require('bcrypt'),
+      mailer         = require('./config/Mailer'),
+      twilio         = require('./config/Twilio'),
+      models = require('./bootstrap/boot-mongoose')
 ;
 
-
-// load all models
-require('./bootstrap/boot-mongoose');
 
 // routes
 // let indexRouter = require('./routes/index');
 let UserRouter = require('./routes/Users');
+let AdminRouter = require('./routes/Admin');
 
 let app = express();
 
@@ -31,7 +34,7 @@ let app = express();
 // app.set('view engine', 'pug');
 
 // logger
-app.use(logger('dev'));
+app.use(morgan('combined', {stream: winston.stream}));
 
 // CORS
 app.use(cors());
@@ -65,7 +68,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // def routes
 app.use('/api/v1/users', UserRouter);
-// app.use('/users', usersRouter);
+app.use('/api/v1/admin', AdminRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

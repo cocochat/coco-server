@@ -1,4 +1,4 @@
-let db                 = require('../config/mongoose'),
+let db                 = require('../config/Mongoose'),
     mongoose           = db.mongoose,
     Schema             = db.Schema,
     SALT_ROUNDS        = 12,

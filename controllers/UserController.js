@@ -1,10 +1,30 @@
 let User = require('../models/User');
+let auth = require('../config/Authentication');
+let mailer = require('../config/Mailer');
+let winston = require ('../config/Winston');
+
 
 module.exports = {
     login         : (req, res) => {
         let email    = req.body.email,
             password = req.body.password;
-        
+        User.getAuthenticated(email, password, (err, user, reason) => {
+            if (reason) {
+                return res.json({status: false, message: `Error: ${reason}`, data: {errReason: reason}, meta: {}});
+            }
+            if (err) {
+                return res.json({status: false, message: `Error: ${err.message}`, data: {user: user}, meta: {}});
+            }
+            if (user) {
+                let token = auth.createToken(user);
+                return res.json({
+                    status : true,
+                    message: "Successfully logged in.",
+                    data   : {user: user, token: token},
+                    meta   : {}
+                });
+            }
+        })
     },
     register      : (req, res) => {
         if (req.body.email &&
@@ -46,9 +66,9 @@ module.exports = {
         if (req.body.email &&
             req.body.username &&
             req.body.phoneNumber) {
-            user.email  = req.body.email;
-            user.username  = req.body.username;
-            user.phoneNumber  = req.body.phoneNumber;
+            user.email       = req.body.email;
+            user.username    = req.body.username;
+            user.phoneNumber = req.body.phoneNumber;
             user.save()
                 .then(userUpdated => {
                     return res.json({status: true, message: "User Updated .", data: {user: user}, meta: {}})

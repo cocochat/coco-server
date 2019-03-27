@@ -1,7 +1,8 @@
 const nodemailer = require('nodemailer');
+const winston    = require('./Winston');
 
 let options = {
-    from : process.env.MAIL_USER,
+    from  : process.env.MAIL_USER,
     host  : process.env.MAIL_HOST,
     port  : process.env.MAIL_PORT,
     secure: process.env.MAIL_SECURE,
@@ -17,12 +18,11 @@ transporter.verify((err, suc) => {
     if (err) {
         console.log(err);
         winston.record(err);
-        exit(-1);
+        // exit(-1);
     } else {
         console.log("Mailer Ready.");
     }
 });
-
 
 
 module.exports = transporter;

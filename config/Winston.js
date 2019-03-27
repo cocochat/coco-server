@@ -1,4 +1,5 @@
 const winston = require("winston");
+const appRoot = require("app-root-path");
 
 let options = {
     file: {
@@ -13,12 +14,12 @@ let options = {
     console: {
         level: 'debug',
         handleExceptions: true,
-        json: false,
+        json: true,
         colorize: true,
     },
 };
 
-let logger = new winston.Logger({
+let logger = winston.createLogger({
     transports: [
         new winston.transports.File(options.file),
         new winston.transports.Console(options.console)

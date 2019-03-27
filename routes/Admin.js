@@ -4,7 +4,7 @@ let authMiddleware = require('../config/Authentication');
 let adminController = require('../controllers/AdminController');
 
 router.use(authMiddleware.checkToken);
-router.post('/invite', adminController.sendInvite());
+// router.post('/invite', adminController.sendInvite());
 
 
 // todo set twilio account creation

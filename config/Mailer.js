@@ -12,17 +12,19 @@ let options = {
     }
 };
 
-const transporter = nodemailer.createTransport(options);
+// const transporter = nodemailer.createTransport(options);
+//
+// transporter.verify((err, suc) => {
+//     if (err) {
+//         console.log("HERE");
+//         console.log(err);
+//         console.log("HERE");
+//         winston.record(err);
+//         // exit(-1);
+//     } else {
+//         console.log("Mailer Ready.");
+//     }
+// });
 
-transporter.verify((err, suc) => {
-    if (err) {
-        console.log(err);
-        winston.record(err);
-        // exit(-1);
-    } else {
-        console.log("Mailer Ready.");
-    }
-});
 
-
-module.exports = transporter;
+// module.exports = transporter;

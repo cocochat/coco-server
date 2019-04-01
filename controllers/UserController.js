@@ -27,8 +27,8 @@ module.exports = {
         })
     },
     register      : (req, res) => {
-        if (req.body.email &&
-            req.body.username &&
+        if (req.body.name &&
+            req.body.email &&
             req.body.phoneNumber &&
             req.body.password) {
             
@@ -38,7 +38,7 @@ module.exports = {
                 password   : req.body.password,
                 phoneNumber: req.body.phoneNumber,
             };
-            
+            console.log(userData);
             //use schema.create to insert data into the db
             User.create(userData, function (err, user) {
                 if (err) {

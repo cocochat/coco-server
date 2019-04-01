@@ -1,6 +1,6 @@
 let User    = require('../models/User');
 let auth    = require('../config/Authentication');
-let mailer  = require('../config/Mailer');
+// let mailer  = require('../config/Mailer');
 let winston = require('../config/Winston');
 
 

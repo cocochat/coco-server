@@ -11,6 +11,11 @@ let UserSchema = new Schema({
         trim    : true,
         required: true
     },
+    userType     : {
+        type: String,
+        enum: ['Superadmin', 'Admin', 'Manager', 'User'],
+        default: 'User'
+    },
     email        : {
         type     : String,
         required : true,

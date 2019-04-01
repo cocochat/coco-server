@@ -15,14 +15,14 @@ const createError    = require('http-errors'),
       mongoose       = db.mongoose,
       Schema         = db.Schema,
       bcrypt         = require('bcrypt'),
-      mailer         = require('./config/Mailer'),
+      // mailer         = require('./config/Mailer'),
       // twilio         = require('./config/Twilio'),
       models         = require('./bootstrap/boot-mongoose')
 ;
 
 
 // routes
-// let indexRouter = require('./routes/index');
+let indexRouter = require('./routes/index');
 let UserRouter  = require('./routes/Users');
 let AdminRouter = require('./routes/Admin');
 
@@ -30,8 +30,8 @@ let app = express();
 
 
 // view engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
 
 // logger
 app.use(morgan('combined', {stream: winston.stream}));
@@ -52,10 +52,14 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 // cookie parser
 app.use(cookieParser());
-// body parser
-app.use(bodyParser.urlencoded({extended: true}));
-// parse application/json
-app.use(bodyParser.json);
+
+//todo check error
+// // body parser
+// app.use(bodyParser.urlencoded({extended: true}));
+// // parse application/json
+// app.use(bodyParser.json);
+
+
 // sass compiler
 app.use(sassMiddleware({
     src           : path.join(__dirname, 'public'),
@@ -64,8 +68,9 @@ app.use(sassMiddleware({
     sourceMap     : true
 }));
 app.use(express.static(path.join(__dirname, 'public')));
-// backup body parser
 
+//test routes
+app.use('/', indexRouter);
 // def routes
 app.use('/api/v1/users', UserRouter);
 app.use('/api/v1/admin', AdminRouter);

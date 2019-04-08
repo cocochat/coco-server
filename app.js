@@ -2,6 +2,7 @@ require('dotenv').config();
 const createError    = require('http-errors'),
       express        = require('express'),
       bodyParser     = require('body-parser'),
+      helper        = require('./helpers/helper'),
       path           = require('path'),
       cookieParser   = require('cookie-parser'),
       appRoot        = require('app-root-path'),

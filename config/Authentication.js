@@ -17,9 +17,10 @@ module.exports = {
                         message: 'Token is not valid'
                     });
                 } else {
-                    let user = User.findByMail(decoded.email);
-                    req.user = user;
-                    next();
+                    User.findByEmail(decoded.email, function(err, user) {
+                        req.user = user;
+                        next();
+                    });
                 }
             });
         } else {

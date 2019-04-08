@@ -1,6 +1,8 @@
 let db                 = require('../config/Mongoose'),
     mongoose           = db.mongoose,
     Schema             = db.Schema,
+    bcrypt             = require('bcrypt'),
+    SALT               = process.env.SALT,
     SALT_ROUNDS        = 12,
     MAX_LOGIN_ATTEMPTS = 5,
     LOCK_TIME          = 2 * 60 * 60 * 1000;
@@ -12,8 +14,8 @@ let UserSchema = new Schema({
         required: true
     },
     userType     : {
-        type: String,
-        enum: ['Superadmin', 'Admin', 'Manager', 'User'],
+        type   : String,
+        enum   : ['Superadmin', 'Admin', 'Manager', 'User'],
         default: 'User'
     },
     email        : {
@@ -69,9 +71,9 @@ UserSchema.virtual('isLocked').get(function () {
 
 // enums
 let reasons = UserSchema.statics.failedLogin = {
-    NOT_FOUND         : 0,
-    PASSWORD_INCORRECT: 1,
-    MAX_ATTEMPTS      : 3
+    NOT_FOUND         : {id: 1, msg: "User Not Found."},
+    PASSWORD_INCORRECT: {id: 2, msg: "Incorrect Credentials."},
+    MAX_ATTEMPTS      : {id: 3, msg: "Exceeded Max Attempts. Please contact Administrator."}
 };
 
 // methods
@@ -85,7 +87,7 @@ UserSchema.methods.comparePassword = function (candidatePassword, cb) {
 UserSchema.methods.incrementLoginAttempts = function (cb) {
     // if we have a previous lock that has expired, restart at 1
     if (this.lockUntil && this.lockUntil < Date.now()) {
-        return this.update({
+        return this.update({_id: this.id}, {
             $set  : {loginAttempts: 1},
             $unset: {lockUntil: 1}
         }, cb);
@@ -97,21 +99,19 @@ UserSchema.methods.incrementLoginAttempts = function (cb) {
     if (this.loginAttempts + 1 >= MAX_LOGIN_ATTEMPTS && !this.isLocked) {
         updates.$set = {lockUntil: Date.now() + LOCK_TIME};
     }
-    return this.update(updates, cb);
+    return this.update({_id: this.id}, updates, cb);
 };
 
 
 // statics
-UserSchema.statics.findByEmail = (email, cb) => {
-    return this.findOne({
-        where: {
-            email: email
-        }
+UserSchema.statics.findByEmail = function (email, cb) {
+    this.findOne({
+        email: email
     }, cb);
 };
 
 UserSchema.statics.getAuthenticated = function (email, password, cb) {
-    this.findOne({email: email}, function (err, user) {
+    return this.findOne({email: email}, function (err, user) {
         if (err) return cb(err);
         
         // make sure the user exists
@@ -131,7 +131,7 @@ UserSchema.statics.getAuthenticated = function (email, password, cb) {
         // test for a matching password
         user.comparePassword(password, function (err, isMatch) {
             if (err) return cb(err);
-            
+            console.log(isMatch);
             // check if the password was a match
             if (isMatch) {
                 // if there's no lock or failed attempts, just return the user
@@ -157,12 +157,11 @@ UserSchema.statics.getAuthenticated = function (email, password, cb) {
 };
 
 // hooks
-UserSchema.pre('save', (next) => {
+UserSchema.pre('save', function (next) {
     // get user
     let user = this;
-    
     // todo check if password is modified
-    if (!user.isModified('password')) return next();
+    if (!user.isEmpty() && !user.isModified('password')) return next();
     
     // generate a salt
     bcrypt.genSalt(SALT_ROUNDS, function (err, salt) {

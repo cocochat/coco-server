@@ -9,6 +9,9 @@ router.post('/forgot-password', userController.forgotPassword);
 router.get('/verify', userController.verify);
 router.use(authMiddleware.checkToken);
 router.put('/update', userController.update);
+router.put('/update/welcome-message', userController.updateWelcomeMessage);
+router.post('/update/profile-pic', userController.uploadProfilePic);
+router.post('/register/phone-number', userController.registerTwilioNumber);
 
 
 // todo set twilio account creation

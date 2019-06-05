@@ -1,11 +1,11 @@
-let User = require('../models/User');
-let auth = require('../config/Authentication');
-let mailer = require('../config/Mailer');
-let winston = require ('../config/Winston');
+let User    = require('../models/User');
+let auth    = require('../config/Authentication');
+let mailer  = require('../config/Mailer');
+let winston = require('../config/Winston');
 
 
 module.exports = {
-    login         : (req, res) => {
+    login               : (req, res) => {
         let email    = req.body.email,
             password = req.body.password;
         User.getAuthenticated(email, password, function (err, user, reason) {
@@ -26,7 +26,7 @@ module.exports = {
             }
         })
     },
-    register      : (req, res, next) => {
+    register            : (req, res, next) => {
         if (req.body.name &&
             req.body.email &&
             req.body.phoneNumber &&
@@ -51,21 +51,19 @@ module.exports = {
             return res.json({status: false, message: "Missing Parameter.", data: {requestParams: req.body}, meta: {}})
         }
     },
-    forgotPassword: (req, res) => {
+    forgotPassword      : (req, res) => {
         // todo send mail
     },
-    verify        : (req, res) => {
+    verify              : (req, res) => {
         // define verification model
         // use twilio
     },
-    update        : (req, res) => {
+    update              : (req, res) => {
         
         if (!req.user) {
             return res.json({status: false, message: "Missing Token.", data: {}, meta: {}})
         }
         let user = req.user;
-        console.log('user');
-        console.log(user);
         if (req.body.email &&
             req.body.phoneNumber) {
             user.email       = req.body.email;
@@ -73,12 +71,63 @@ module.exports = {
             user.save()
                 .then(userUpdated => {
                     console.log(userUpdated);
-                    return res.json({status: true, message: "User Updated .", data: {user: user}, meta: {}})
+                    return res.json({status: true, message: "User Updated.", data: {user: user}, meta: {}})
                 })
                 .catch(err => {
                     console.log(err)
                     return res.json({status: false, message: "Error Updating User.", data: {err: err}, meta: {}})
                 })
         }
+    },
+    updateWelcomeMessage: (req, res) => {
+        if (!req.user) {
+            return res.json({status: false, message: "Authentication Error: Please login.", data: {}, meta: {}})
+        }
+        let user = req.user;
+        if (req.body.welcomeMessage) {
+            user.welcomeMessage = req.body.welcomeMessage;
+            user.save()
+                .then(welcomeMessageUpdated => {
+                    return res.json({status: true, message: "Welcome Message Updated.", data: {user: user}, meta: {}});
+                })
+                .catch(err => {
+                    winston.record(err);
+                    return res.json({
+                        status : false,
+                        message: "Error Updating welcome message",
+                        data   : {err: err},
+                        meta   : {}
+                    });
+                })
+        }
+    },
+    uploadProfilePic    : (req, res) => {
+        if (!req.user) {
+            return res.json({status: false, message: "Authentication Error: Please login.", data: {}, meta: {}});
+        }
+        let user = req.user;
+        if (req.body.profilePic) {
+            user.profilePic = req.body.profilePic;
+            user.save()
+                .then(userProfilePicUpdated => {
+                    return res.json({status: true, message: "Profile Picture Updated.", data: {user: user}, meta: {}});
+                })
+                .catch(err => {
+                    winston.record(err);
+                    return res.json({
+                        status : false,
+                        message: "Error Updating Profile Picture",
+                        data   : {err: err},
+                        meta   : {}
+                    });
+                })
+        }
+    },
+    registerTwilioNumber: (req, res) => {
+        if (!req.user) {
+            return res.json({status: false, message: "Authentication Error: Please login.", data: {}, meta: {}});
+        }
+        let user = req.user;
+        //todo add new twilion numbers registeration and linking
     }
 }

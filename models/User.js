@@ -8,56 +8,65 @@ let db                 = require('../config/Mongoose'),
     LOCK_TIME          = 2 * 60 * 60 * 1000;
 
 let UserSchema = new Schema({
-    name         : {
+    name          : {
         type    : String,
         trim    : true,
         required: true
     },
-    userType     : {
+    userType      : {
         type   : String,
         enum   : ['Superadmin', 'Admin', 'Manager', 'User'],
         default: 'User'
     },
-    email        : {
+    email         : {
         type     : String,
         required : true,
         trim     : true,
         lowercase: true,
         unique   : true,
     },
-    password     : {
+    password      : {
         type    : String,
         required: true,
         min     : 8,
         max     : 25,
     },
-    phoneNumber  : {
+    phoneNumber   : {
         type    : String,
         required: true,
     },
-    loginAttempts: {
+    welcomeMessage: {
+        type   : Text,
+        default: "Thank you for subscribing to my SMS channel!"
+    },
+    profilePic: {
+        type: Text,
+        required: false,
+        default: null,
+    },
+    loginAttempts : {
         type    : Number,
         required: true,
         default : 0
     },
-    lockUntil    : {
+    lockUntil     : {
         type: Number
     },
-    token        : {
+    token         : {
         type: String
     },
-    refreshToken : {
+    refreshToken  : {
         type: String
     },
-    isVerified   : {
+    isVerified    : {
         type   : Boolean,
         default: false,
     },
-    createdAt    : {
+    createdAt     : {
         type   : Date,
         default: Date.now()
     },
-    updatedAt    : {
+    updatedAt     : {
         type   : Date,
         default: Date.now()
     }

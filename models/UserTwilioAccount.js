@@ -1,27 +1,39 @@
-let db                 = require('../config/Mongoose'),
-    mongoose           = db.mongoose,
-    Schema             = db.Schema;
+let db       = require('../config/Mongoose'),
+    mongoose = db.mongoose,
+    Schema   = db.Schema;
 
 let UserTwilioAccountSchema = new Schema({
     userId         : {
         type    : Number,
         required: true
     },
-    accountId : {
-        type: String,
-        required: true,
-        //todo remove default
-        default: "",
-    },
-    phoneNumber  : {
+    twilioSID      : {
         type    : String,
         required: true,
     },
-    createdAt    : {
+    authToken      : {
+        type    : String,
+        required: true,
+    },
+    friendlyName   : {
+        type    : String,
+        required: true,
+    },
+    ownerAccountSid: {
+        type    : String,
+        required: true,
+    },
+    status         : {
+        type    : String,
+        enum    : ['active', 'suspended', 'closed'],
+        required: true,
+        default : 'active',
+    },
+    createdAt      : {
         type   : Date,
         default: Date.now()
     },
-    updatedAt    : {
+    updatedAt      : {
         type   : Date,
         default: Date.now()
     }

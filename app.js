@@ -2,7 +2,7 @@ require('dotenv').config();
 const createError    = require('http-errors'),
       express        = require('express'),
       bodyParser     = require('body-parser'),
-      helper        = require('./helpers/helper'),
+      helper         = require('./helpers/helper'),
       path           = require('path'),
       cookieParser   = require('cookie-parser'),
       appRoot        = require('app-root-path'),
@@ -21,11 +21,26 @@ const createError    = require('http-errors'),
       models         = require('./bootstrap/boot-mongoose')
 ;
 
+// CORS
+let whitelist   = ['http://localhost:7777']
+let corsOptions = {
+    origin: function (origin, callback) {
+        // if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true)
+        // } else {
+        //     callback(new Error('Not allowed by CORS'))
+        // }
+    }
+}
+// Then pass them to cors:
+app.use(cors(corsOptions));
+app.use(cors());
 
 // routes
-let indexRouter = require('./routes/index');
-let UserRouter  = require('./routes/Users');
-let AdminRouter = require('./routes/Admin');
+let indexRouter    = require('./routes/index');
+let UserRouter     = require('./routes/Users');
+let AdminRouter    = require('./routes/Admin');
+let CampaignRouter = require('./routes/Campain');
 
 let app = express();
 
@@ -37,8 +52,6 @@ app.set('view engine', 'pug');
 // logger
 app.use(morgan('combined', {stream: winston.stream}));
 
-// CORS
-app.use(cors());
 
 // Session
 app.use(session({
@@ -75,6 +88,7 @@ app.use('/', indexRouter);
 // def routes
 app.use('/api/v1/users', UserRouter);
 app.use('/api/v1/admin', AdminRouter);
+app.use('/api/v1/campaign', CampaignRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
